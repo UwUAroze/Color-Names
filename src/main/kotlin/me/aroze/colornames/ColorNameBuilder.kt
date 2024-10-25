@@ -6,25 +6,6 @@ import java.io.InputStreamReader
 import java.nio.charset.StandardCharsets
 import kotlin.system.measureNanoTime
 
-fun main() {
-    val colorNames = ColorNameBuilder()
-        .loadDefaults()
-        .build()
-
-        measureNanoTime {
-            println(colorNames.findClosestColor("#FF00FF"))
-            println(colorNames.findClosestColor("#FF04FF"))
-            println(colorNames.findClosestColor("#FF05FF"))
-            println(colorNames.findClosestColor("#FF06FF"))
-            println(colorNames.findClosestColor("#FF12FF"))
-            println(colorNames.findClosestColor("#FFA5FF"))
-            println(colorNames.findClosestColor("#FFA6FF"))
-            println(colorNames.findClosestColor("#FF23FF"))
-            println(colorNames.findClosestColor("#FF28FF"))
-            println(colorNames.findClosestColor("#FF29FF"))
-        }.also { println("Time taken: ${it/1000000.0} ms") }
-}
-
 class ColorNameBuilder {
     private val colorNames = ArrayList<CachedColor>()
 

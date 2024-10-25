@@ -4,8 +4,10 @@ import com.github.ajalt.colormath.model.RGB
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.nio.charset.StandardCharsets
-import kotlin.system.measureNanoTime
 
+/**
+ * Builder for loading and caching color names, giving you a [ColorNames] instance
+ */
 class ColorNameBuilder {
     private val colorNames = ArrayList<CachedColor>()
 
@@ -17,8 +19,8 @@ class ColorNameBuilder {
         return this
     }
 
-    fun build(): ColorNamesTree {
-        return ColorNamesTree(colorNames)
+    fun build(): ColorNames {
+        return ColorNames(colorNames)
     }
 
     private fun parseColorCSV(reader: InputStreamReader): List<CachedColor> {

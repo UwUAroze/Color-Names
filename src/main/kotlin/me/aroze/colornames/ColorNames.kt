@@ -4,7 +4,11 @@ import com.github.ajalt.colormath.model.LAB
 import com.github.ajalt.colormath.model.RGB
 import kotlin.math.*
 
-class ColorNamesTree(
+/**
+ * Represents a collection of color names in the form of a K-D tree that can be used to find the closest color to a
+ * given LAB value
+ */
+class ColorNames(
     colorNames: List<CachedColor>
 ) {
     private val kdTree: KDNode?
@@ -13,6 +17,11 @@ class ColorNamesTree(
         kdTree = buildKDTree(colorNames.map { Triple(it.lightness, it.aComponent, it.bComponent) to it }.toList(), 0)
     }
 
+    /**
+     * Find the closest color to the given hex color
+     *
+     * @param hex The hex color to find the closest color to, e.g. "#FF0000", "FF0000"
+     */
     fun findClosestColor(hex: String): CachedColor {
         return findClosestColor(
             RGB(hex)
@@ -20,6 +29,13 @@ class ColorNamesTree(
         )
     }
 
+    /**
+     * Find the closest color to the given RGB color
+     *
+     * @param r The red component of the color, from 0 to 255
+     * @param g The green component of the color, from 0 to 255
+     * @param b The blue component of the color, from 0 to 255
+     */
     fun findClosestColor(r: Int, g: Int, b: Int): CachedColor {
         return findClosestColor(
             RGB(r/255f, g/255f, b/255f)
@@ -27,6 +43,9 @@ class ColorNamesTree(
         )
     }
 
+    /**
+     * Find the closest color to the given [LAB] color
+     */
     fun findClosestColor(lab: LAB): CachedColor {
         val point = Triple(lab.l, lab.a, lab.b)
         return findNearest(kdTree, point, 0)?.second

@@ -1,44 +1,60 @@
 package me.aroze.colornames
 
+import com.github.ajalt.colormath.model.RGB
+import java.io.BufferedReader
 import java.io.InputStreamReader
-import kotlin.system.measureTimeMillis
+import java.nio.charset.StandardCharsets
+import kotlin.system.measureNanoTime
 
 fun main() {
-    measureTimeMillis {
-        val colorNames = ColorNameBuilder()
-            .loadDefaults()
-            .build()
-    }.also { println("Loaded in $it ms") }
+    val colorNames = ColorNameBuilder()
+        .loadDefaults()
+        .build()
+
+        measureNanoTime {
+            println(colorNames.findClosestColor("#FF00FF"))
+            println(colorNames.findClosestColor("#FF04FF"))
+            println(colorNames.findClosestColor("#FF05FF"))
+            println(colorNames.findClosestColor("#FF06FF"))
+            println(colorNames.findClosestColor("#FF12FF"))
+            println(colorNames.findClosestColor("#FFA5FF"))
+            println(colorNames.findClosestColor("#FFA6FF"))
+            println(colorNames.findClosestColor("#FF23FF"))
+            println(colorNames.findClosestColor("#FF28FF"))
+            println(colorNames.findClosestColor("#FF29FF"))
+        }.also { println("Time taken: ${it/1000000.0} ms") }
 }
 
 class ColorNameBuilder {
-
-    private val colorNames = mutableListOf<ColorName>()
+    private val colorNames = ArrayList<CachedColor>()
 
     fun loadDefaults(): ColorNameBuilder {
         val inputStream = javaClass.getResourceAsStream("/colornames.csv")
             ?: throw IllegalStateException("colornames.csv not found")
 
-        colorNames.addAll(parseColorCSV(inputStream.reader()))
+        colorNames.addAll(parseColorCSV(inputStream.reader(StandardCharsets.UTF_8)))
         return this
     }
 
-    fun build(): ColorNames {
-        return ColorNames(colorNames)
+    fun build(): ColorNamesTree {
+        return ColorNamesTree(colorNames)
     }
 
-    private fun parseColorCSV(reader: InputStreamReader): List<ColorName> {
-        return reader.readLines()
-            .drop(1)
-            .map { line ->
-                val (name, hex) = line
-                    .replace("#", "")
-                    .split(",")
-                val red = hex.substring(0, 2).toInt(16)
-                val green = hex.substring(2, 4).toInt(16)
-                val blue = hex.substring(4, 6).toInt(16)
-                ColorName(name, red, green, blue)
-            }
-    }
+    private fun parseColorCSV(reader: InputStreamReader): List<CachedColor> {
+        return BufferedReader(reader, 32768).use { buffered ->
+            buffered.lineSequence()
+                .drop(1)
+                .map { line ->
+                    val commaIndex = line.indexOf(',')
+                    val name = line.substring(0, commaIndex)
+                    val hex = line.substring(commaIndex + 1)
 
+                    val lab = RGB(hex)
+                        .toLAB()
+
+                    CachedColor(name, lab.l, lab.a, lab.b)
+                }
+                .toList()
+        }
+    }
 }

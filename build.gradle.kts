@@ -10,7 +10,7 @@ repositories {
 }
 
 dependencies {
-    testImplementation(kotlin("test"))
+    implementation("com.github.ajalt.colormath:colormath:3.6.0")
 }
 
 tasks.test {

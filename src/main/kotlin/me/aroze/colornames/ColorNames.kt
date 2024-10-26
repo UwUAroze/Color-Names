@@ -18,6 +18,28 @@ class ColorNames(
     }
 
     /**
+     * Get the name of the closest color to the given hex color
+     */
+    fun getName(hex: String): String {
+        return findClosestColor(hex).name
+    }
+
+    /**
+     * Get the name of the closest color to the given RGB color
+     */
+    fun getName(r: Int, g: Int, b: Int): String {
+        return findClosestColor(r, g, b).name
+    }
+
+    /**
+     * Get the name of the closest color to the given [LAB] color
+     */
+    fun getName(lab: LAB): String {
+        return findClosestColor(lab).name
+    }
+
+
+    /**
      * Find the closest color to the given hex color
      *
      * @param hex The hex color to find the closest color to, e.g. "#FF0000", "FF0000"

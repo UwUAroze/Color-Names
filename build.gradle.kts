@@ -11,7 +11,7 @@ repositories {
 }
 
 dependencies {
-    implementation("com.github.ajalt.colormath:colormath:3.6.0")
+    api("com.github.ajalt.colormath:colormath:3.6.0")
 }
 
 tasks.test {

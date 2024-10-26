@@ -6,7 +6,7 @@ This library's primary purpose is to be able to specify a color and end up with 
 `"#ffffff"` -> `White`<br>
 `"#facfea"` -> `Classic Rose`<br>
 `#abcdef` -> `Alphabet Blue`<br>
-`#12345` -> `Incremental Blue`<br>
+`#123456` -> `Incremental Blue`<br>
 `#c1b2a3` -> `Balanced Beige`<br>
 *...and so on*
 

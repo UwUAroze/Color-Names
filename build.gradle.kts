@@ -17,6 +17,18 @@ dependencies {
 tasks.test {
     useJUnitPlatform()
 }
+
+publishing {
+    publications {
+        create<MavenPublication>("mavenJava") {
+            from(components["java"])
+            groupId = "me.aroze"
+            artifactId = "Color-Names"
+            version = "1.0-SNAPSHOT"
+        }
+    }
+}
+
 kotlin {
     jvmToolchain(21)
 }

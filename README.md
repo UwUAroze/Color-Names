@@ -1,6 +1,6 @@
 # Color names
 
-This library's primary purpose is to be able to specify a color and end up a fitting name for that color.
+This library's primary purpose is to be able to specify a color and end up with a fitting name for that color 🌈
 
 ## Examples:<br>
 `"#ffffff"` -> `White`<br>

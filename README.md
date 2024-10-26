@@ -30,3 +30,54 @@ Benchmarks:
 | 10                      | 9.4ms              | 0.2ms             | 
 | 100                     | 42.2ms             | 1.7ms             | 
 | 1000                    | 278.6ms            | 3.3ms             |
+
+# Usage
+
+## Importing
+
+### Gradle.kts
+```kts
+repositories {
+      maven("https://jitpack.io")
+}
+
+dependencies {
+      implementation("me.aroze:color-names:1.0.1")
+}
+```
+
+### Maven
+```xml
+<repository>
+  <id>jitpack.io</id>
+  <url>https://jitpack.io</url>
+</repository>
+
+<dependency>
+  <groupId>me.aroze</groupId>
+  <artifactId>color-names</artifactId>
+  <version>1.0.1</version>
+</dependency>
+```
+
+## Closest color
+
+### Java
+```java
+public ColorNames colorNames = new ColorNameBuilder()
+  .loadDefaults()
+  .build();
+
+String fromHex = colorNames.getName("#facfea"); // "Classic Rose"
+String fromRGB = colorNames.getName(224, 224, 255) // "Stoic White"
+```
+
+### Kotlin
+```kt
+val colorNames = ColorNameBuilder()
+  .loadDefaults()
+  .build()
+
+val fromHex = colorNames.getName("#facfea") // "Classic Rose"
+val fromRGB = colorNames.getName(224, 224, 255) // "Stoic White"
+```

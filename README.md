@@ -31,6 +31,8 @@ Benchmarks:
 | 100                     | 42.2ms             | 1.7ms             | 
 | 1000                    | 278.6ms            | 3.3ms             |
 
+*All of these were conducted ~100 times and averaged. Tests were ran on an i9 13900k. Your results may vary, but relative performance should be a lot faster with the K-D Tree.*
+
 # Usage
 
 ## Importing

@@ -11,6 +11,9 @@ import java.nio.charset.StandardCharsets
 class ColorNameBuilder {
     private val colorNames = ArrayList<CachedColor>()
 
+    /**
+     * Loads the color names from the bundled colornames.csv file
+     */
     fun loadDefaults(): ColorNameBuilder {
         val inputStream = javaClass.getResourceAsStream("/colornames.csv")
             ?: throw IllegalStateException("colornames.csv not found")
@@ -19,6 +22,11 @@ class ColorNameBuilder {
         return this
     }
 
+    /**
+     * Builds the [ColorNames] instance
+     *
+     * @return the [ColorNames] instance
+     */
     fun build(): ColorNames {
         return ColorNames(colorNames)
     }

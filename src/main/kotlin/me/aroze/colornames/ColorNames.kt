@@ -2,175 +2,126 @@ package me.aroze.colornames
 
 import com.github.ajalt.colormath.model.LAB
 import com.github.ajalt.colormath.model.RGB
-import kotlin.math.*
+import me.aroze.colornames.tree.KDNode
+import me.aroze.colornames.tree.KDTreeBuilder
+import java.awt.Color
+import kotlin.math.sqrt
 
 /**
- * Represents a collection of color names in the form of a K-D tree that can be used to find the closest color to a
- * given LAB value
+ * Represents a collection of cached colors and provides methods for finding the closest color, as well as quickly
+ * retrieving a fitting name for a color.
  */
-class ColorNames(
-    colorNames: List<CachedColor>
-) {
-    private val kdTree: KDNode?
+class ColorNames(colorNames: List<CachedColor>) {
+    private val root: KDNode? = KDTreeBuilder.buildTree(colorNames.toMutableList(), 0)
+    private var minDist = Float.POSITIVE_INFINITY
+    private var bestNode: KDNode? = null
 
-    init {
-        kdTree = buildKDTree(colorNames.map { Triple(it.lightness, it.aComponent, it.bComponent) to it }.toList(), 0)
-    }
-
-    /**
-     * Get the name of the closest color to the given hex color
-     */
-    fun getName(hex: String): String {
-        return findClosestColor(hex).name
-    }
-
-    /**
-     * Get the name of the closest color to the given RGB color
-     */
-    fun getName(r: Int, g: Int, b: Int): String {
-        return findClosestColor(r, g, b).name
-    }
-
-    /**
-     * Get the name of the closest color to the given [LAB] color
-     */
-    fun getName(lab: LAB): String {
-        return findClosestColor(lab).name
-    }
-
-
-    /**
-     * Find the closest color to the given hex color
-     *
-     * @param hex The hex color to find the closest color to, e.g. "#FF0000", "FF0000"
-     */
-    fun findClosestColor(hex: String): CachedColor {
-        return findClosestColor(
-            RGB(hex)
-                .toLAB()
-        )
-    }
-
-    /**
-     * Find the closest color to the given RGB color
-     *
-     * @param r The red component of the color, from 0 to 255
-     * @param g The green component of the color, from 0 to 255
-     * @param b The blue component of the color, from 0 to 255
-     */
-    fun findClosestColor(r: Int, g: Int, b: Int): CachedColor {
-        return findClosestColor(
-            RGB(r/255f, g/255f, b/255f)
-                .toLAB()
-        )
-    }
-
-    /**
-     * Find the closest color to the given [LAB] color
-     */
-    fun findClosestColor(lab: LAB): CachedColor {
-        val point = Triple(lab.l, lab.a, lab.b)
-        return findNearest(kdTree, point, 0)?.second
-            ?: throw IllegalStateException("No colors found?")
-    }
-
-    private class KDNode(
-        val point: Triple<Float, Float, Float>,
-        val color: CachedColor,
-        val left: KDNode?,
-        val right: KDNode?
-    )
-
-    private fun buildKDTree(
-        points: List<Pair<Triple<Float, Float, Float>, CachedColor>>,
-        depth: Int
-    ): KDNode? {
-        if (points.isEmpty()) return null
-
-        val k = 3 // We're working in 3D space (L*a*b*)
-        val axis = depth % k
-
-        // Sort points based on current axis
-        val sortedPoints = points.sortedBy { (point, _) ->
-            when (axis) {
-                0 -> point.first  // L
-                1 -> point.second // a
-                else -> point.third // b
-            }
-        }
-
-        val medianIdx = sortedPoints.size / 2
-        val medianPoint = sortedPoints[medianIdx]
-
-        return KDNode(
-            medianPoint.first,
-            medianPoint.second,
-            buildKDTree(sortedPoints.subList(0, medianIdx), depth + 1),
-            buildKDTree(sortedPoints.subList(medianIdx + 1, sortedPoints.size), depth + 1)
-        )
-    }
-
-    private fun findNearest(
-        node: KDNode?,
-        target: Triple<Float, Float, Float>,
-        depth: Int
-    ): Pair<Triple<Float, Float, Float>, CachedColor>? {
-        if (node == null) return null
+    private fun searchNearest(node: KDNode?, l: Float, a: Float, b: Float, depth: Int) {
+        if (node == null) return
 
         val axis = depth % 3
-        val nextBranch: KDNode?
-        val oppositeBranch: KDNode?
-
-        // Determine which branch to search first
-        val comparison = when (axis) {
-            0 -> target.first.compareTo(node.point.first)
-            1 -> target.second.compareTo(node.point.second)
-            else -> target.third.compareTo(node.point.third)
+        val dim = when(axis) {
+            0 -> l - node.l
+            1 -> a - node.a
+            else -> b - node.b
         }
 
-        if (comparison <= 0) {
-            nextBranch = node.left
-            oppositeBranch = node.right
-        } else {
-            nextBranch = node.right
-            oppositeBranch = node.left
+        val dist = sqrt(
+            (l - node.l) * (l - node.l) +
+            (a - node.a) * (a - node.a) +
+            (b - node.b) * (b - node.b))
+
+        if (dist < minDist) {
+            minDist = dist
+            bestNode = node
         }
 
-        // Search down the most promising branch
-        val best = findNearest(nextBranch, target, depth + 1)
-        var bestPair = if (best == null || squaredDeltaE(target, node.point) < squaredDeltaE(target, best.first)) {
-            Pair(node.point, node.color)
-        } else {
-            best
-        }
+        val firstChild = if (dim <= 0) node.left else node.right
+        val secondChild = if (dim <= 0) node.right else node.left
 
-        // Check if we need to search the other branch
-        val axisDist = when (axis) {
-            0 -> abs(target.first - node.point.first)
-            1 -> abs(target.second - node.point.second)
-            else -> abs(target.third - node.point.third)
-        }
+        searchNearest(firstChild, l, a, b, depth + 1)
 
-        if (axisDist * axisDist < squaredDeltaE(target, bestPair.first)) {
-            val best2 = findNearest(oppositeBranch, target, depth + 1)
-            if (best2 != null && squaredDeltaE(target, best2.first) < squaredDeltaE(target, bestPair.first)) {
-                bestPair = best2
-            }
+        if (dim * dim < minDist) {
+            searchNearest(secondChild, l, a, b, depth + 1)
         }
-
-        return bestPair
     }
 
     /**
-     * Calculate the squared delta-e between two points in the CIELAB color space
+     * Finds the closest color to the given [com.github.ajalt.colormath.Color] object
+     *
+     * @param color the color
+     * @return the closest color
      */
-    private fun squaredDeltaE(
-        p1: Triple<Float, Float, Float>,
-        p2: Triple<Float, Float, Float>
-    ): Float {
-        val dL = p1.first - p2.first
-        val da = p1.second - p2.second
-        val db = p1.third - p2.third
-        return abs(dL * dL + da * da + db * db)
+    fun findClosestColor(color: com.github.ajalt.colormath.Color): CachedColor {
+        color.toLAB().let { lab ->
+            minDist = Float.POSITIVE_INFINITY
+            bestNode = null
+            searchNearest(root, lab.l, lab.a, lab.b, 0)
+            return bestNode?.color ?: throw IllegalStateException("No colors found")
+        }
     }
+
+    /**
+     * Finds the closest color to the given hex color
+     *
+     * @param hex the hex color, e.g. "#FF0000" or "FF0000"
+     * @return the closest color
+     */
+    fun findClosestColor(hex: String) =
+        findClosestColor(RGB(hex))
+
+    /**
+     * Finds the closest color to the given RGB color
+     *
+     * @param r Red value (0-255)
+     * @param g Green value (0-255)
+     * @param b Blue value (0-255)
+     * @return the closest color
+     */
+    fun findClosestColor(r: Int, g: Int, b: Int) =
+        findClosestColor(RGB(r/255f, g/255f, b/255f))
+
+    /**
+     * Finds the closest color to the given [Color] object
+     *
+     * @param color the color
+     * @return the closest color
+     */
+    fun findClosestColor(color: Color) =
+        findClosestColor(RGB(color.red/255f, color.green/255f, color.blue/255f))
+
+
+    /**
+     * Finds a fitting name for any given hex color
+     *
+     * @param hex the hex color, e.g. "#FF0000" or "FF0000"
+     * @return a nice fitting color name
+     */
+    fun getName(hex: String): String = findClosestColor(hex).name
+
+    /**
+     * Finds a fitting name for any given RGB color
+     *
+     * @param r Red value (0-255)
+     * @param g Green value (0-255)
+     * @param b Blue value (0-255)
+     * @return a nice fitting color name
+     */
+    fun getName(r: Int, g: Int, b: Int): String = findClosestColor(r, g, b).name
+
+    /**
+     * Finds a fitting name for any given [LAB] color
+     *
+     * @param color the [LAB] color
+     * @return a nice fitting color name
+     */
+    fun getName(lab: LAB): String = findClosestColor(lab).name
+
+    /**
+     * Finds a fitting name for any given [Color] object
+     *
+     * @param color the color
+     * @return a nice fitting color name
+     */
+    fun getName(color: Color): String = findClosestColor(color).name
 }

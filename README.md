@@ -83,7 +83,8 @@ public ColorNames colorNames = new ColorNameBuilder()
   .build();
 
 String fromHex = colorNames.getName("#facfea"); // "Classic Rose"
-String fromRGB = colorNames.getName(224, 224, 255) // "Stoic White"
+String fromRGB = colorNames.getName(224, 224, 255); // "Stoic White"
+String fromColor = colorNames.getName(new Color(255, 219, 240)); // "Silky Pink"
 ```
 
 ### Kotlin
@@ -94,4 +95,5 @@ val colorNames = ColorNameBuilder()
 
 val fromHex = colorNames.getName("#facfea") // "Classic Rose"
 val fromRGB = colorNames.getName(224, 224, 255) // "Stoic White"
+val fromColor = colorNames.getName(Color(255, 219, 240)) // "Silky Pink"
 ```

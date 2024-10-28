@@ -56,7 +56,7 @@ repositories {
 }
 
 dependencies {
-      implementation("me.aroze:color-names:1.0.1")
+      implementation("me.aroze:color-names:1.0.2")
 }
 ```
 
@@ -70,7 +70,7 @@ dependencies {
 <dependency>
   <groupId>me.aroze</groupId>
   <artifactId>color-names</artifactId>
-  <version>1.0.1</version>
+  <version>1.0.2</version>
 </dependency>
 ```
 

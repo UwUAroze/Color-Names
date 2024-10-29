@@ -124,4 +124,19 @@ class ColorNames(colorNames: List<CachedColor>) {
      * @return a nice fitting color name
      */
     fun getName(color: Color): String = findClosestColor(color).name
+
+    private companion object {
+        /**
+         * Shorthand function to creates a new [ColorNames] instance with the bundled/default list
+         *
+         * @return the [ColorNames] instance
+         */
+        @JvmStatic
+        fun create(): ColorNames {
+            return ColorNameBuilder()
+                .loadDefaults()
+                .build()
+        }
+    }
+
 }

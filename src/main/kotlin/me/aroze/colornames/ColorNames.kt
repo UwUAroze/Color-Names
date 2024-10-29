@@ -11,10 +11,16 @@ import kotlin.math.sqrt
  * Represents a collection of cached colors and provides methods for finding the closest color, as well as quickly
  * retrieving a fitting name for a color.
  */
-class ColorNames(colorNames: List<CachedColor>) {
+class ColorNames(colorNames: List<NamedColor>) {
     private val root: KDNode? = KDTreeBuilder.buildTree(colorNames.toMutableList(), 0)
     private var minDist = Float.POSITIVE_INFINITY
     private var bestNode: KDNode? = null
+
+    companion object {
+        @JvmStatic
+        @JvmName("create")
+        fun create() = ColorNameBuilder().loadDefaults().build()
+    }
 
     private fun searchNearest(node: KDNode?, l: Float, a: Float, b: Float, depth: Int) {
         if (node == null) return
@@ -52,7 +58,7 @@ class ColorNames(colorNames: List<CachedColor>) {
      * @param color the color
      * @return the closest color
      */
-    fun findClosestColor(color: com.github.ajalt.colormath.Color): CachedColor {
+    fun findClosestColor(color: com.github.ajalt.colormath.Color): NamedColor {
         color.toLAB().let { lab ->
             minDist = Float.POSITIVE_INFINITY
             bestNode = null

@@ -1,6 +1,6 @@
 package me.aroze.colornames.tree
 
-import me.aroze.colornames.CachedColor
+import me.aroze.colornames.NamedColor
 
 /**
  * Builds a K-D tree from a list of cached colors
@@ -13,7 +13,7 @@ object KDTreeBuilder {
      * @param depth the current depth of the tree
      * @return the root node of the K-D tree
      */
-    fun buildTree(points: MutableList<CachedColor>, depth: Int): KDNode? {
+    fun buildTree(points: MutableList<NamedColor>, depth: Int): KDNode? {
         if (points.isEmpty()) return null
 
         val axis = depth % 3

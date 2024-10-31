@@ -12,9 +12,9 @@ This library's primary purpose is to be able to specify a color and end up with 
 
 ## Where do the names come from?!
 Color Names is meant to act as an easy drop-in dependency you can import and start using, meaning it's already bundled with a list of color names, a list that is maintained by another awesome open-sourced project: [meodai/color-names](https://github.com/meodai/color-names/). There's around 16.7 million sRGB colors, obviously not all of these are named, but this list provides plenty to work with, we can just extrapolate the closest color from the list.
-<br><br>
-If you'd like to make changes to the default list, consider reviewing their [naming rules](https://github.com/meodai/color-names/blob/master/CONTRIBUTING.md) and contributing there. Alternatively, you can fork this project yourself and replace/modify the list in `src/main/resources/colornames.csv` with whatever you'd like.
-
+<br>
+#### Ermm actually I don't like the bundled color list 🤓🤓
+Color Names remain customisable for those who'd like the extra control: you can use the `ColorNameBuilder` (usage outlined below) to fully customize the color names used, enabling you to add your own colors and even bypass the default list entirely. Alternatively, you could fork this project yourself and replace/modify the list in `src/main/resources/colornames.csv` with whatever you'd like. If you'd like to make changes to the default list, consider reviewing the naming rules of the open sourced list mentioned above and contributing there.
 ## How about performance, and how accurate is the "nearest" color?
 The default colour list has over 30,000 names (that's a lot). Trying to find the closest color by comparing distance in the 3D color space can be pretty computationally expensive.
 <br><br>
@@ -56,7 +56,7 @@ repositories {
 }
 
 dependencies {
-      implementation("me.aroze:color-names:1.0.2")
+      implementation("me.aroze:color-names:1.0.3")
 }
 ```
 
@@ -70,7 +70,7 @@ dependencies {
 <dependency>
   <groupId>me.aroze</groupId>
   <artifactId>color-names</artifactId>
-  <version>1.0.2</version>
+  <version>1.0.3</version>
 </dependency>
 ```
 
@@ -79,7 +79,7 @@ dependencies {
 ## Creating the instance
 ### Java
 ```java
-public ColorNames colorNames = colorNames.create() // Easily create an instance with the default color list
+public ColorNames colorNames = ColorNames.create() // Easily create an instance with the default color list
 ```
 ```java
 public ColorNames colorNames = new ColorNameBuilder() // Builder with extra customisability
@@ -89,7 +89,7 @@ public ColorNames colorNames = new ColorNameBuilder() // Builder with extra cust
 ```
 ### Kotlin
 ```kt
-val colorNames = colorNames.create() // Easily create an instance with the default color list
+val colorNames = ColorNames.create() // Easily create an instance with the default color list
 ```
 ```kt
 val colorNames = ColorNameBuilder() // Builder with extra customisability

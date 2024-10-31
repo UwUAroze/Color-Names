@@ -74,25 +74,42 @@ dependencies {
 </dependency>
 ```
 
-## Closest color
+<br>
 
+## Creating the instance
 ### Java
 ```java
-public ColorNames colorNames = new ColorNameBuilder()
-  .loadDefaults()
+public ColorNames colorNames = colorNames.create() // Easily create an instance with the default color list
+```
+```java
+public ColorNames colorNames = new ColorNameBuilder() // Builder with extra customisability
+  .addColor("Peachy Pink", "#ffdbed") // Custom color!! There's also .addColors() and various overloads
+  .loadDefaults() // Loads the default list, can be skipped entirely if you'd like to
   .build();
+```
+### Kotlin
+```kt
+val colorNames = colorNames.create() // Easily create an instance with the default color list
+```
+```kt
+val colorNames = ColorNameBuilder() // Builder with extra customisability
+  .addColor("Peachy Pink", "#ffdbed") // Custom color!! There's also .addColors() and various overloads
+  .loadDefaults() // Loads the default list, can be skipped entirely if you'd like to
+  .build();
+```
 
+<br>
+
+## Getting a fitting color name
+### Java
+```java
 String fromHex = colorNames.getName("#facfea"); // "Classic Rose"
 String fromRGB = colorNames.getName(224, 224, 255); // "Stoic White"
 String fromColor = colorNames.getName(new Color(255, 219, 240)); // "Silky Pink"
 ```
-
 ### Kotlin
 ```kt
-val colorNames = ColorNameBuilder()
-  .loadDefaults()
-  .build()
-
+// Kotlin
 val fromHex = colorNames.getName("#facfea") // "Classic Rose"
 val fromRGB = colorNames.getName(224, 224, 255) // "Stoic White"
 val fromColor = colorNames.getName(Color(255, 219, 240)) // "Silky Pink"

@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "me.aroze"
-version = "1.0-SNAPSHOT"
+version = "1.0.4"
 
 repositories {
     mavenCentral()
@@ -39,7 +39,7 @@ publishing {
             from(components["java"])
             groupId = "me.aroze"
             artifactId = "Color-Names"
-            version = "1.0-SNAPSHOT"
+            version = "1.0.4"
         }
     }
 }

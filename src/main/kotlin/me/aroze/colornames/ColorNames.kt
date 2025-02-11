@@ -4,6 +4,7 @@ import com.github.ajalt.colormath.model.LAB
 import com.github.ajalt.colormath.model.RGB
 import me.aroze.colornames.tree.KDNode
 import me.aroze.colornames.tree.KDTreeBuilder
+import me.aroze.colornames.tree.SearchContext
 import java.awt.Color
 import kotlin.math.sqrt
 
@@ -13,10 +14,8 @@ import kotlin.math.sqrt
  */
 class ColorNames(colorNames: List<NamedColor>) {
     private val root: KDNode? = KDTreeBuilder.buildTree(colorNames.toMutableList(), 0)
-    private var minDist = Float.POSITIVE_INFINITY
-    private var bestNode: KDNode? = null
 
-    private fun searchNearest(node: KDNode?, l: Float, a: Float, b: Float, depth: Int) {
+    private fun searchNearest(node: KDNode?, l: Float, a: Float, b: Float, depth: Int, context: SearchContext) {
         if (node == null) return
 
         val axis = depth % 3
@@ -28,21 +27,21 @@ class ColorNames(colorNames: List<NamedColor>) {
 
         val dist = sqrt(
             (l - node.l) * (l - node.l) +
-            (a - node.a) * (a - node.a) +
-            (b - node.b) * (b - node.b))
+                (a - node.a) * (a - node.a) +
+                (b - node.b) * (b - node.b))
 
-        if (dist < minDist) {
-            minDist = dist
-            bestNode = node
+        if (dist < context.minDist) {
+            context.minDist = dist
+            context.bestNode = node
         }
 
         val firstChild = if (dim <= 0) node.left else node.right
         val secondChild = if (dim <= 0) node.right else node.left
 
-        searchNearest(firstChild, l, a, b, depth + 1)
+        searchNearest(firstChild, l, a, b, depth + 1, context)
 
-        if (dim * dim < minDist) {
-            searchNearest(secondChild, l, a, b, depth + 1)
+        if (dim * dim < context.minDist) {
+            searchNearest(secondChild, l, a, b, depth + 1, context)
         }
     }
 
@@ -54,10 +53,9 @@ class ColorNames(colorNames: List<NamedColor>) {
      */
     fun findClosestColor(color: com.github.ajalt.colormath.Color): NamedColor {
         color.toLAB().let { lab ->
-            minDist = Float.POSITIVE_INFINITY
-            bestNode = null
-            searchNearest(root, lab.l, lab.a, lab.b, 0)
-            return bestNode?.color ?: throw IllegalStateException("No colors found")
+            val context = SearchContext()
+            searchNearest(root, lab.l, lab.a, lab.b, 0, context)
+            return context.bestNode?.color ?: throw IllegalStateException("No colors found")
         }
     }
 

@@ -1,7 +1,6 @@
 package me.aroze.colornames
 
 import com.github.ajalt.colormath.model.RGB
-import jdk.internal.vm.vector.VectorSupport.test
 import java.awt.Color
 import java.io.BufferedReader
 import java.io.File

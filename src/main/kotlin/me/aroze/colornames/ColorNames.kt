@@ -123,7 +123,7 @@ class ColorNames(colorNames: List<NamedColor>) {
      */
     fun getName(color: Color): String = findClosestColor(color).name
 
-    private companion object {
+    companion object {
         /**
          * Shorthand function to creates a new [ColorNames] instance with the bundled/default list
          *

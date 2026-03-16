@@ -18,10 +18,10 @@ Color Names remain customisable for those who'd like the extra control: you can 
 ## How about performance, and how accurate is the "nearest" color?
 The default colour list has over 30,000 names (that's a lot). Trying to find the closest color by comparing distance in the 3D color space can be pretty computationally expensive.
 <br><br>
-Other libraries with similar functionality seem to often approach this by iterating over all the colors, plotting the sRGB values and calculating [Euclidian distance](https://en.wikipedia.org/wiki/Euclidean_distance) and whatever has the lowest distance is the "closest" color. This has 2 notable concerns:
+Other libraries with similar functionality seem to often approach this linearly by iterating over all the colors, plotting the sRGB values as 3D vectors, then calculating [Euclidian distance](https://en.wikipedia.org/wiki/Euclidean_distance) between the query vector and each and every other vector. At the end, whatever has the lowest distance is the "closest" color. This has 2 notable concerns:
 <br>
-1. The sRGB color space isn't all that accurate in terms of visual similarity, ie: 3 sRGB values that are equally apart in terms of raw numerical value are unlikely to be visually "different" by the same factor. Okay... so, how do we put a number on the visual similarity of colors? Fortunately, that's not my job. The [CIELAB Color Space](https://en.wikipedia.org/wiki/CIELAB_color_space) has us covered! This color space precisely revolves around positioning colors with uniform visual perception and for this reason, its used for all sorts of color correction work, and is exactly what we need. Perfect, we convert our values from the sRGB color space to the CIELAB color space, problem one solved!
-2. Iterating through >30,000 vectors in a 3D space and finding the distance between all of them to a point is... a lot of calculations. But it's exactly what we need, since that's how we find the [Delta-E](https://en.wikipedia.org/wiki/Color_difference#CIELAB_%CE%94E*) variance between all our CIELAB colours to see whats the closest. So, we should really try to optimise this. For this we cache our colors in a [K-D Tree](https://en.wikipedia.org/wiki/K-d_tree) with 3 dimensions, providing us with fast [nearest neighbour searches](https://en.wikipedia.org/wiki/Nearest_neighbor_search). This takes the time complexity for searches from O(n) to O(logn). In practice, this makes a pretty substantial difference.
+1. The sRGB color space isn't all that accurate in terms of visual similarity, ie: 3 sRGB values that are equally apart in terms of raw numerical value are unlikely to be visually "different" by the same factor. Okay... so, how do we put a number on the visual similarity of colors? Fortunately, that's not my job. The [CIELAB Color Space](https://en.wikipedia.org/wiki/CIELAB_color_space) has us covered! CIELAB precisely revolves around positioning colors with uniform visual perception, it's typically used for color correction work, but is exactly what we need. Perfect, we convert and cache our values from the sRGB color space to the CIELAB color space, problem one solved!
+2. Iterating through >30,000 vectors in a 3D space and finding the distance between all of them to a point is... a lot of calculations. But it's exactly what we need, since that's how we find the [Delta-E](https://en.wikipedia.org/wiki/Color_difference#CIELAB_%CE%94E*) variance between all our CIELAB colous to figure out whats the "closest". So, we should really try to optimise this. For this we cache our colors in a [K-D Tree](https://en.wikipedia.org/wiki/K-d_tree) with 3 dimensions, providing us with fast [nearest neighbour searches](https://en.wikipedia.org/wiki/Nearest_neighbor_search). This takes the time complexity for searches from O(n) to O(logn). In practice, this makes a pretty substantial difference.
 
 ### Benchmarks:
 | 10 lookups - size of list:   | Linear approach | K-D Tree approach |   | 30,000 colors - No. of lookups: | Linear approach | K-D Tree approach |
@@ -35,10 +35,12 @@ Other libraries with similar functionality seem to often approach this by iterat
 > [!NOTE]
 > All of these tests were conducted ~100 times and averaged. Tests were ran on an i9 13900k. Your results may vary, but relative performance should be a lot faster with the K-D Tree.
 
+*With typical use (lookups with the default list), you can expect a roughly 50x performance improvement. For me, this resulted in being able to confidently do these lookups syncronously in real time applications, which wasn't the case previously :3*
+
 <br>
 
 ### Pretty notes ✨
-While researching K-D trees, I put together some visuals to help me understand, and I figured why not make them pretty and provide it here. Hopfully these prove to be helpful for anyone interested in learning about K-D trees. And remember, there are plenty of other great resources out there (YouTube videos did it for me!).
+While researching K-D trees, I put together some visuals to help me understand, and I figured why not make them pretty and provide it here. Hopfully these prove to be helpful for anyone interested in learning about K-D trees. There's plenty of other great resources out there (YouTube videos did it for me!).
 ![Untitled-2024-03-21-21563x](https://github.com/user-attachments/assets/33405c02-8fa0-4c89-8f18-13e011b6f717)
 > [!NOTE]
 > You can open that image in a new tab for a nicer, full-resolution view.

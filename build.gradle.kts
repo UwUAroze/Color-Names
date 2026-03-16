@@ -34,11 +34,21 @@ tasks.javadoc {
 }
 
 publishing {
+    repositories {
+        maven {
+            url = uri("https://repo.aroze.me/repository/public/")
+            credentials {
+                username = findProperty("repo.aroze.username") as String? ?: System.getenv("REPO_USER")
+                password = findProperty("repo.aroze.password") as String? ?: System.getenv("REPO_PASS")
+            }
+        }
+    }
+
     publications {
         create<MavenPublication>("mavenJava") {
             from(components["java"])
             groupId = "me.aroze"
-            artifactId = "Color-Names"
+            artifactId = "color-names"
             version = "1.0.4"
         }
     }

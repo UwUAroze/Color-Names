@@ -52,7 +52,7 @@ While researching K-D trees, I put together some visuals to help me understand, 
 ### Gradle.kts
 ```kts
 repositories {
-      maven("https://jitpack.io")
+      maven("https://repo.aroze.me/repository/public/")
 }
 
 dependencies {
@@ -63,8 +63,8 @@ dependencies {
 ### Maven
 ```xml
 <repository>
-  <id>jitpack.io</id>
-  <url>https://jitpack.io</url>
+  <id>aroze</id>
+  <url>https://repo.aroze.me/repository/public/</url>
 </repository>
 
 <dependency>
@@ -79,7 +79,7 @@ dependencies {
 ## Creating the instance
 ### Java
 ```java
-public ColorNames colorNames = ColorNames.create() // Easily create an instance with the default color list
+public ColorNames colorNames = ColorNames.create(); // Easily create an instance with the default color list
 ```
 ```java
 public ColorNames colorNames = new ColorNameBuilder() // Builder with extra customisability
